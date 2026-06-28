@@ -154,7 +154,7 @@ public class GameLogic {
         // Place the initial card on the table
         Card initialCard = deck.drawCard();
         deck.placeOnTable(initialCard);
-        tableSum = CardValueCalculator.calculateDelta(initialCard, 0);
+        tableSum = 0;
 
         fireGameStarted(tableSum);
     }
