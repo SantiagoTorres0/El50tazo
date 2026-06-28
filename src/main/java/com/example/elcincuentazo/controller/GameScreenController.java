@@ -1,16 +1,23 @@
 package com.example.elcincuentazo.controller;
 
+import com.example.elcincuentazo.exceptions.GameOverException;
+import com.example.elcincuentazo.exceptions.InvalidCardPlayException;
 import com.example.elcincuentazo.model.Card;
+import com.example.elcincuentazo.model.CardValueCalculator;
 import com.example.elcincuentazo.model.GameLogic;
 import com.example.elcincuentazo.model.Player;
 import com.example.elcincuentazo.observer.GameEventListener;
 import com.example.elcincuentazo.view.MainMenuView;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -23,12 +30,15 @@ import java.util.ResourceBundle;
  * Controlador de GameScreen.fxml.
  *
  * Recibe el modelo vía initModel() (llamado desde GameScreenView después
- * de cargar el FXML). Se registra como GameEventListener para que el
- * modelo le notifique los eventos de juego y actualice la UI.
+ * de cargar el FXML). Crea internamente un {@link GameController} (clase
+ * sin dependencias de JavaFX) que se encarga de orquestar {@code GameLogic}
+ * y {@code TurnManager}; este controlador se limita a:
+ *   (1) traducir clics de la GUI en llamadas a GameController,
+ *   (2) traducir eventos del modelo (vía GameEventListener) en
+ *       actualizaciones visuales.
  *
- * NOTA PARA EL COLEGA: los métodos onPlayCard, onDrawFromDeck y los
- * callbacks de GameEventListener tienen sus stubs listos. Solo hay que
- * completar los TODO con la lógica de presentación.
+ * Toda la lógica de reglas vive en GameLogic / CardValueCalculator / Deck /
+ * Player; toda la lógica de orquestación de turnos vive en GameController.
  */
 public class GameScreenController implements Initializable, GameEventListener {
 
@@ -80,16 +90,33 @@ public class GameScreenController implements Initializable, GameEventListener {
     @FXML private Button btnDrawCard;            // "Tomar del mazo"
     @FXML private Button btnMenuReturn;          // "Menú"
 
-    // ── Modelo ────────────────────────────────────────────────────────────────
-    private GameLogic model;
-    private int       numOpponents;
-    private Card      selectedCard;
+    // ── Controlador / Modelo ────────────────────────────────────────────────
+    private GameController gameController;
+    private GameLogic       model;       // acceso de lectura cómodo a gameController.getModel()
+    private int             numOpponents;
+    private Card             selectedCard;
+
+    // ── Arreglos auxiliares para acceder a los paneles de CPU por índice ──────
+    // Índice 0 = "Máquina 1" (model.getPlayers().get(1)), índice 1 = "Máquina 2", etc.
+    private Pane[]  handPlayerPanes;
+    private Label[] playerStatusLabels;
+    private Label[] turnIndicatorLabels;
+    private Label[] eliminatedBadgeLabels;
+
+    /** Símbolos de palo indexados igual que Card.getSuit() (0=Picas, 1=Corazones, 2=Tréboles, 3=Diamantes). */
+    private static final String[] SUIT_SYMBOLS = {"♠", "♥", "♣", "♦"};
 
     // ─────────────────────────────────────────────────────────────────────────
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // model todavía es null aquí; la init real ocurre en initModel()
+        // gameController todavía es null aquí; la init real ocurre en initModel().
+        // Los campos @FXML ya están inyectados, así que podemos armar los
+        // arreglos auxiliares indexados por jugador-máquina (1, 2 o 3).
+        handPlayerPanes       = new Pane[]{handPlayer1, handPlayer2, handPlayer3};
+        playerStatusLabels    = new Label[]{lblPlayer1Status, lblPlayer2Status, lblPlayer3Status};
+        turnIndicatorLabels   = new Label[]{indicatorPlayer1, indicatorPlayer2, indicatorPlayer3};
+        eliminatedBadgeLabels = new Label[]{elimPlayer1, elimPlayer2, elimPlayer3};
     }
 
     /**
@@ -100,61 +127,183 @@ public class GameScreenController implements Initializable, GameEventListener {
      * @param numOpponents número de rivales (1, 2 o 3)
      */
     public void initModel(GameLogic model, int numOpponents) {
-        this.model        = model;
-        this.numOpponents = numOpponents;
+        this.gameController = new GameController(model);
+        this.model           = gameController.getModel();
+        this.numOpponents    = numOpponents;
 
-        // Registrarse como observer del modelo
-        model.addGameEventListener(this);
+        // Registrarse como observer del modelo (vía GameController)
+        gameController.addGameEventListener(this);
 
-        configurarVisibilidadJugadores();
-        sincronizarEstadoInicial();
+        configureOpponentVisibility();
+        synchronizeInitialState();
+
+        // Si el primer turno fuera de una máquina, GameController la dispara sola.
+        gameController.start();
     }
 
     // ── Configuración inicial ─────────────────────────────────────────────────
 
-    private void configurarVisibilidadJugadores() {
-        boolean hayDosOmas = numOpponents >= 2;
-        boolean hayTres    = numOpponents == 3;
+    private void configureOpponentVisibility() {
+        boolean hasTwoOrMore = numOpponents >= 2;
+        boolean hasThree     = numOpponents == 3;
 
-        panePlayer2.setVisible(hayDosOmas);
-        panePlayer2.setManaged(hayDosOmas);
-        panePlayer3.setVisible(hayTres);
-        panePlayer3.setManaged(hayTres);
+        panePlayer2.setVisible(hasTwoOrMore);
+        panePlayer2.setManaged(hasTwoOrMore);
+        panePlayer3.setVisible(hasThree);
+        panePlayer3.setManaged(hasThree);
     }
 
-    private void sincronizarEstadoInicial() {
-        actualizarSumaMesa(model.getTableSum());
-        actualizarContadorMazo(model.getDeck().drawPileSize());
+    private void synchronizeInitialState() {
+        updateTableSum(model.getTableSum());
+        updateDeckCounter(model.getDeck().drawPileSize());
 
-        Card cartaInicial = model.getDeck().peekTableTop();
-        if (cartaInicial != null) {
+        Card initialCard = model.getDeck().peekTableTop();
+        if (initialCard != null) {
             lblNoCard.setVisible(false);
-            lblLastCardDesc.setText(cartaInicial.toString());
+            lblLastCardDesc.setText(initialCard.toString());
         }
 
-        lblTurnStatus.setText("Tu turno");
-        lblHumanStatus.setText("Selecciona una carta para jugar");
-        btnPlayCard.setDisable(true);
+        // GameLogic.humanPlayCard(...) ya incluye el draw automático de la
+        // carta de reemplazo, así que no existe una acción manual de "tomar
+        // del mazo" en este diseño. Se deshabilitan los controles asociados.
+        deckZone.setDisable(true);
         btnDrawCard.setDisable(true);
 
-        // TODO (colega): renderizar cartas del humano en handHuman
-        // TODO (colega): renderizar cartas boca abajo de CPUs en handPlayer1/2/3
+        renderHumanHand();
+        for (int i = 1; i <= numOpponents; i++) {
+            renderMachineHand(model.getPlayers().get(i));
+        }
+
+        // Reutilizamos onTurnStarted para fijar el estado visual del primer
+        // turno (incluye la verificación de eliminación temprana).
+        onTurnStarted(model.getCurrentPlayer());
+    }
+
+    // ── Renderizado de cartas ─────────────────────────────────────────────────
+
+    private void renderHumanHand() {
+        handHuman.getChildren().clear();
+        selectedCard = null;
+        btnPlayCard.setDisable(true);
+
+        Player humanPlayer = model.getPlayers().get(0);
+        for (Card card : humanPlayer.getHand().getCards()) {
+            handHuman.getChildren().add(createHumanCardNode(card));
+        }
+    }
+
+    private void renderMachineHand(Player machinePlayer) {
+        int   playerIndex = model.getPlayers().indexOf(machinePlayer); // 1, 2 o 3
+        Pane  handPane     = handPlayerPanes[playerIndex - 1];
+
+        handPane.getChildren().clear();
+        for (int i = 0; i < machinePlayer.getHand().size(); i++) {
+            handPane.getChildren().add(createFaceDownCardNode());
+        }
+        playerStatusLabels[playerIndex - 1].setText(machinePlayer.getHand().size() + " cartas");
+    }
+
+    /** Crea el nodo visual de una carta boca arriba del jugador humano, seleccionable si es jugable. */
+    private Node createHumanCardNode(Card card) {
+        VBox cardNode = new VBox();
+        cardNode.setAlignment(Pos.CENTER);
+        cardNode.getStyleClass().addAll("card", isRedCard(card) ? "card-red" : "card-black");
+
+        Label valueLabel = new Label(getValueLabel(card));
+        valueLabel.getStyleClass().add("card-value-label");
+        Label suitLabel = new Label(getSuitSymbol(card));
+        suitLabel.getStyleClass().add("card-suit-label");
+        cardNode.getChildren().addAll(valueLabel, suitLabel);
+
+        boolean playable = CardValueCalculator.isPlayable(card, model.getTableSum());
+        if (playable) {
+            cardNode.getStyleClass().add("card-playable");
+            cardNode.setOnMouseClicked(event -> selectCard(card, cardNode));
+        } else {
+            cardNode.setOpacity(0.45); // visualmente "no jugable" en este momento
+        }
+
+        return cardNode;
+    }
+
+    /** Crea el nodo visual de una carta boca abajo (mano de una máquina). */
+    private Node createFaceDownCardNode() {
+        VBox cardNode = new VBox();
+        cardNode.getStyleClass().addAll("card", "card-small", "card-face-down");
+        return cardNode;
+    }
+
+    private String getSuitSymbol(Card card) {
+        int suit = card.getSuit();
+        return (suit >= 0 && suit < SUIT_SYMBOLS.length) ? SUIT_SYMBOLS[suit] : "?";
+    }
+
+    private boolean isRedCard(Card card) {
+        int suit = card.getSuit();
+        return suit == 1 || suit == 3; // Corazones (1) y Diamantes (3)
+    }
+
+    private String getValueLabel(Card card) {
+        switch (card.getValue()) {
+            case 1:  return "A";
+            case 11: return "J";
+            case 12: return "Q";
+            case 13: return "K";
+            default: return String.valueOf(card.getValue());
+        }
+    }
+
+    // ── Selección de carta ────────────────────────────────────────────────────
+
+    private void selectCard(Card card, Node cardNode) {
+        Player currentPlayer = model.getCurrentPlayer();
+        if (currentPlayer == null || !currentPlayer.isHuman()) {
+            return; // no es el turno del humano, ignorar el clic
+        }
+
+        for (Node child : handHuman.getChildren()) {
+            child.getStyleClass().remove("card-selected");
+        }
+        cardNode.getStyleClass().add("card-selected");
+
+        selectedCard = card;
+        btnPlayCard.setDisable(false);
+        lblHumanStatus.setText("Carta seleccionada: " + card);
+    }
+
+    private void deselectCard() {
+        for (Node child : handHuman.getChildren()) {
+            child.getStyleClass().remove("card-selected");
+        }
+        selectedCard = null;
+        btnPlayCard.setDisable(true);
     }
 
     // ── Helpers de UI ─────────────────────────────────────────────────────────
 
-    private void actualizarSumaMesa(int suma) {
-        lblTableSum.setText(String.valueOf(suma));
-        double progreso = Math.max(0, suma) / 50.0;
-        pbSumProgress.setProgress(progreso);
+    private void updateTableSum(int sum) {
+        lblTableSum.setText(String.valueOf(sum));
+        double progress = Math.max(0, sum) / 50.0;
+        pbSumProgress.setProgress(progress);
         pbSumProgress.getStyleClass().removeAll("sum-progress-warn", "sum-progress-danger");
-        if      (suma > 45) pbSumProgress.getStyleClass().add("sum-progress-danger");
-        else if (suma > 35) pbSumProgress.getStyleClass().add("sum-progress-warn");
+        if      (sum > 45) pbSumProgress.getStyleClass().add("sum-progress-danger");
+        else if (sum > 35) pbSumProgress.getStyleClass().add("sum-progress-warn");
     }
 
-    private void actualizarContadorMazo(int restantes) {
-        lblDeckCount.setText(String.valueOf(restantes));
-        lblDeckCountSmall.setText(restantes + " restantes");
+    private void updateDeckCounter(int remaining) {
+        lblDeckCount.setText(String.valueOf(remaining));
+        lblDeckCountSmall.setText(remaining + " restantes");
+    }
+
+    private void updateTurnIndicators(Player currentPlayer) {
+        indicatorHuman.setVisible(currentPlayer.isHuman());
+        for (Label indicator : turnIndicatorLabels) {
+            indicator.setVisible(false);
+        }
+        if (!currentPlayer.isHuman()) {
+            int playerIndex = model.getPlayers().indexOf(currentPlayer);
+            turnIndicatorLabels[playerIndex - 1].setVisible(true);
+        }
     }
 
     // ── Eventos FXML ──────────────────────────────────────────────────────────
@@ -162,21 +311,38 @@ public class GameScreenController implements Initializable, GameEventListener {
     /** El jugador pulsa "Jugar carta ▶". */
     @FXML
     private void onPlayCard() {
-        if (selectedCard == null) return;
-        // TODO (colega): model.humanPlayCard(selectedCard)
-        //                manejar InvalidCardPlayException y GameOverException
+        if (selectedCard == null) {
+            return;
+        }
+        try {
+            gameController.playCard(selectedCard);
+            // El turno y la programación de la siguiente máquina (si aplica)
+            // ya quedaron resueltos dentro de GameController.playCard(...).
+        } catch (InvalidCardPlayException invalidPlay) {
+            // onInvalidPlay() ya actualizó lblHumanStatus con el mensaje al
+            // usuario; aquí solo limpiamos la selección visual.
+            deselectCard();
+        } catch (GameOverException gameOver) {
+            lblGameMessage.setText(gameOver.getMessage());
+        }
     }
 
     /** El jugador pulsa "Tomar del mazo" o hace clic en el mazo. */
     @FXML
     private void onDrawFromDeck() {
-        // TODO (colega): model.getDeck().drawCard()
-        //                añadir la carta a handHuman y actualizar contador
+        // En El Cincuentazo el reemplazo de carta es automático: ocurre
+        // dentro de GameController.playCard(...) justo después de jugar.
+        // No existe (ni debe existir) una acción independiente de "tomar
+        // carta", para no romper la regla de mantener siempre 4 cartas.
+        lblHumanStatus.setText("Juega una carta: el reemplazo se toma automáticamente.");
     }
 
     /** Vuelve al menú principal. */
     @FXML
     private void onReturnToMenu() {
+        if (gameController != null) {
+            gameController.stop();
+        }
         try {
             Stage gameStage = (Stage) btnMenuReturn.getScene().getWindow();
             gameStage.close();
@@ -193,61 +359,89 @@ public class GameScreenController implements Initializable, GameEventListener {
 
     @Override
     public void onGameStarted(int tableSum) {
-        // Ya manejado en sincronizarEstadoInicial()
+        // Ya manejado en synchronizeInitialState()
     }
 
     @Override
     public void onTurnStarted(Player player) {
+        // Caso borde descrito en el Javadoc de GameLogic: si llega el turno
+        // a un humano sin ninguna carta jugable, debe quedar eliminado de
+        // inmediato. checkAndEliminateCurrentPlayer() ya dispara los eventos
+        // correspondientes (onPlayerEliminated / onGameOver) si corresponde.
+        if (player.isHuman() && gameController.checkAndEliminateCurrentPlayer()) {
+            return;
+        }
+
+        updateTurnIndicators(player);
+
         if (player.isHuman()) {
+            renderHumanHand(); // refresca qué cartas son jugables con la suma actual
             lblTurnStatus.setText("Tu turno");
-            indicatorHuman.setVisible(true);
-            indicatorPlayer1.setVisible(false);
-            indicatorPlayer2.setVisible(false);
-            indicatorPlayer3.setVisible(false);
-            btnPlayCard.setDisable(false);
+            lblHumanStatus.setText("Selecciona una carta para jugar");
         } else {
             lblTurnStatus.setText(player.getName() + " está jugando...");
-            indicatorHuman.setVisible(false);
             btnPlayCard.setDisable(true);
-            // TODO (colega): mostrar indicador en el panel CPU correcto
         }
     }
 
     @Override
     public void onCardPlayed(Player player, Card card, int newSum) {
-        actualizarSumaMesa(newSum);
+        updateTableSum(newSum);
         lblLastCardDesc.setText(card.toString());
         lblNoCard.setVisible(false);
-        // TODO (colega): animar carta en discardZone
     }
 
     @Override
     public void onCardDrawn(Player player, Card card) {
-        actualizarContadorMazo(model.getDeck().drawPileSize());
-        // TODO (colega): actualizar la mano del jugador correspondiente en la UI
+        updateDeckCounter(model.getDeck().drawPileSize());
+        if (player.isHuman()) {
+            renderHumanHand();
+        } else {
+            renderMachineHand(player);
+        }
     }
 
     @Override
     public void onDeckRefreshed(int newDeckSize) {
-        actualizarContadorMazo(newDeckSize);
+        updateDeckCounter(newDeckSize);
         lblGameMessage.setText("El mazo se ha barajado de nuevo.");
     }
 
     @Override
     public void onPlayerEliminated(Player player) {
         lblGameMessage.setText(player.getName() + " ha sido eliminado.");
-        // TODO (colega): mostrar badge elimPlayer1/2/3 según el jugador
+
+        if (player.isHuman()) {
+            indicatorHuman.setVisible(false);
+            return;
+        }
+
+        int playerIndex = model.getPlayers().indexOf(player);
+        turnIndicatorLabels[playerIndex - 1].setVisible(false);
+        eliminatedBadgeLabels[playerIndex - 1].setVisible(true);
     }
 
     @Override
     public void onGameOver(Player winner) {
-        String msg = winner != null
-            ? "¡" + winner.getName() + " gana la partida!"
-            : "¡Empate!";
-        lblGameMessage.setText(msg);
+        String message = winner != null
+                ? "¡" + winner.getName() + " gana la partida!"
+                : "¡Empate, no hubo sobrevivientes!";
+
+        lblGameMessage.setText(message);
+        lblTurnStatus.setText("Partida finalizada");
+        indicatorHuman.setVisible(false);
         btnPlayCard.setDisable(true);
         btnDrawCard.setDisable(true);
-        // TODO (colega): mostrar overlay de fin de juego
+
+        if (gameController != null) {
+            gameController.stop();
+        }
+
+        Alert gameOverAlert = new Alert(Alert.AlertType.INFORMATION);
+        gameOverAlert.setTitle("Fin de la partida");
+        gameOverAlert.setHeaderText(message);
+        gameOverAlert.setContentText("Pulsa \"Menú\" para volver a jugar.");
+        gameOverAlert.showAndWait();
     }
 
     @Override
