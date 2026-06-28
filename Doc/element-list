@@ -1,0 +1,7 @@
+module:com.example.elcincuentazo
+com.example.elcincuentazo
+com.example.elcincuentazo.controller
+com.example.elcincuentazo.exceptions
+com.example.elcincuentazo.model
+com.example.elcincuentazo.observer
+com.example.elcincuentazo.view
