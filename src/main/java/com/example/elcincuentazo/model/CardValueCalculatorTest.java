@@ -1,4 +1,4 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.model;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

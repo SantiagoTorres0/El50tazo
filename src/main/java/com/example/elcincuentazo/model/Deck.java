@@ -1,6 +1,6 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.model;
 
-import com.example.elcincuentazo.Model.exceptions.EmptyDeckException;
+import com.example.elcincuentazo.exceptions.EmptyDeckException;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

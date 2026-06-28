@@ -1,0 +1,661 @@
+/* ═══════════════════════════════════════════════════════════════
+   EL CINCUENTAZO — Estilos JavaFX
+   Fondo: patrón de rombos oscuros estilo casino
+═══════════════════════════════════════════════════════════════ */
+
+* {
+    -fx-felt-green:   #1a5c36;
+    -fx-felt-dark:    #0f3d22;
+    -fx-felt-border:  #0a2a17;
+    -fx-gold:         #c9a84c;
+    -fx-gold-light:   #e8c56a;
+    -fx-gold-dark:    #9a7a2f;
+    -fx-card-white:   #faf6ee;
+    -fx-card-cream:   #f0e8d5;
+    -fx-card-red:     #c0392b;
+    -fx-card-black:   #1a1a1a;
+    -fx-text-light:   #f0e8d5;
+    -fx-text-muted:   #a8c4b0;
+    -fx-danger:       #e74c3c;
+    -fx-success:      #27ae60;
+    -fx-warn:         #e67e22;
+}
+
+/* ════════════════════════════════════════
+   FONDO GENERAL — patrón rombo casino
+════════════════════════════════════════ */
+
+.root-pane,
+.game-root {
+    -fx-background-color: #0f3d22;
+}
+
+/* El VBox raíz del menú recibe el patrón via imagen repetida.
+   Como JavaFX no soporta CSS background-image con patrones SVG,
+   simulamos con capas de color y bordes. */
+.felt-background {
+        /* Ejemplo de cambio a un degradado lineal clásico de JavaFX */
+    -fx-background-color: linear-gradient(to bottom, #0a4d26, #063318);
+    -fx-min-height: 500;
+}
+
+/* ════════════════════════════════════════
+   MENÚ PRINCIPAL
+════════════════════════════════════════ */
+
+/* Header: banda oscura superior */
+.menu-header {
+    -fx-background-color: #0a2a17;
+    -fx-padding: 30 40 26 40;
+    -fx-alignment: CENTER;
+    -fx-min-width: 640;
+    -fx-border-color: #c9a84c;
+    -fx-border-width: 0 0 2 0;
+}
+
+.suit-icons-top,
+.suit-icons-bottom {
+    -fx-font-size: 20px;
+    -fx-text-fill: #c9a84c;
+}
+
+.game-title {
+    -fx-font-size: 52px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e8c56a;
+    -fx-font-family: "Georgia";
+}
+
+.game-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #a8c4b0;
+    -fx-font-style: italic;
+}
+
+/* Card central */
+.menu-card-container {
+    -fx-padding: 36 60 36 60;
+    -fx-alignment: CENTER;
+    -fx-vgrow: ALWAYS;
+}
+
+.menu-card {
+    -fx-background-color: #faf6ee;
+    -fx-background-radius: 14;
+    -fx-border-color: #c9a84c;
+    -fx-border-width: 2;
+    -fx-border-radius: 14;
+    -fx-padding: 34 44 34 44;
+    -fx-max-width: 540;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 24, 0, 0, 6);
+}
+
+/* Borde interior doble de la card */
+.menu-card-inner {
+    -fx-border-color: rgba(201,168,76,0.3);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-padding: 10;
+}
+
+.section-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+    -fx-font-family: "Georgia";
+}
+
+/* Botones selector de cantidad */
+.player-count-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #1a5c36;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #1a5c36;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Georgia";
+    -fx-padding: 10 22 10 22;
+    -fx-cursor: hand;
+    -fx-min-width: 118;
+}
+
+.player-count-btn:hover {
+    -fx-background-color: rgba(26,92,54,0.1);
+}
+
+.player-count-btn:selected {
+    -fx-background-color: #1a5c36;
+    -fx-text-fill: #f0e8d5;
+    -fx-border-color: #0a2a17;
+}
+
+/* Resumen reglas */
+.rules-summary {
+    -fx-background-color: #ede5d0;
+    -fx-background-radius: 8;
+    -fx-border-color: #d0c4a0;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 14 18 14 18;
+    -fx-max-width: 420;
+}
+
+.rules-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #555;
+    -fx-font-family: "Georgia";
+}
+
+.bullet {
+    -fx-font-size: 14px;
+    -fx-text-fill: #9a7a2f;
+    -fx-font-weight: bold;
+}
+
+.rule-text {
+    -fx-font-size: 13px;
+    -fx-text-fill: #333;
+    -fx-max-width: 360;
+}
+
+/* Botón iniciar */
+.start-button {
+    -fx-background-color: linear-gradient(to bottom, #e8c56a, #c9a84c);
+    -fx-border-color: #9a7a2f;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #1a1a1a;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Georgia";
+    -fx-padding: 13 24 13 24;
+    -fx-cursor: hand;
+}
+
+.start-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #f0d57a, #d4a840);
+}
+
+.start-button:disabled {
+    -fx-background-color: #c8c4b8;
+    -fx-border-color: #aaa;
+    -fx-text-fill: #888;
+    -fx-opacity: 0.75;
+}
+
+/* Footer */
+.menu-footer {
+    -fx-background-color: #0a2a17;
+    -fx-padding: 14 36 14 36;
+    -fx-border-color: #c9a84c;
+    -fx-border-width: 2 0 0 0;
+}
+
+.corner-card {
+    -fx-font-size: 18px;
+    -fx-font-family: "Georgia";
+    -fx-font-weight: bold;
+    -fx-text-fill: #c9a84c;
+}
+
+.footer-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #a8c4b0;
+}
+
+
+/* ════════════════════════════════════════
+   PANTALLA DE JUEGO
+════════════════════════════════════════ */
+
+.game-root {
+    /* Ejemplo de cambio a un degradado lineal clásico de JavaFX */
+    -fx-background-color: linear-gradient(to bottom, #0a4d26, #063318);
+}
+
+/* TOP BAR */
+.top-bar {
+    -fx-background-color: #0a2a17;
+    -fx-padding: 8 20 8 20;
+    -fx-border-color: #c9a84c;
+    -fx-border-width: 0 0 2 0;
+    -fx-min-height: 70;
+}
+
+.top-section {
+    -fx-padding: 0 20 0 20;
+}
+
+.top-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #a8c4b0;
+    -fx-font-family: "Georgia";
+}
+
+.top-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f0e8d5;
+    -fx-font-family: "Georgia";
+}
+
+.sum-display {
+    -fx-background-color: rgba(0,0,0,0.35);
+    -fx-background-radius: 10;
+    -fx-border-color: #9a7a2f;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 10;
+    -fx-padding: 6 28 8 28;
+    -fx-alignment: CENTER;
+    -fx-min-width: 210;
+}
+
+.sum-label-title {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #a8c4b0;
+    -fx-letter-spacing: 1.5px;
+}
+
+.sum-value {
+    -fx-font-size: 38px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Georgia";
+    -fx-text-fill: #e8c56a;
+}
+
+.sum-limit {
+    -fx-font-size: 18px;
+    -fx-text-fill: #a8c4b0;
+    -fx-font-family: "Georgia";
+    -fx-padding: 12 0 0 0;
+}
+
+.sum-progress {
+    -fx-accent: #27ae60;
+    -fx-pref-height: 6;
+    -fx-background-color: rgba(255,255,255,0.15);
+    -fx-background-radius: 3;
+}
+
+.turn-status-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f0e8d5;
+    -fx-font-family: "Georgia";
+}
+
+.turn-indicator-active {
+    -fx-font-size: 18px;
+    -fx-text-fill: #27ae60;
+}
+
+/* ÁREA DE JUEGO */
+.game-area {
+    -fx-padding: 10 8 6 8;
+}
+
+/* Jugadores laterales */
+.side-player-zone {
+    -fx-background-color: rgba(0,0,0,0.18);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(201,168,76,0.25);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 12 8 12 8;
+}
+
+.player-name-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e8c56a;
+    -fx-font-family: "Georgia";
+}
+
+.player-status-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #a8c4b0;
+}
+
+.active-turn-indicator {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f1c40f;
+    -fx-background-color: rgba(241,196,15,0.15);
+    -fx-background-radius: 4;
+    -fx-padding: 3 8 3 8;
+}
+
+.eliminated-badge {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-color: #c0392b;
+    -fx-background-radius: 4;
+    -fx-padding: 4 10 4 10;
+}
+
+.cpu-hand-vertical,
+.cpu-hand-horizontal {
+    -fx-alignment: CENTER;
+}
+
+/* Zona central */
+.center-table-zone {
+    -fx-padding: 0 14 0 14;
+    -fx-alignment: CENTER;
+}
+
+.top-player-zone {
+    -fx-background-color: rgba(0,0,0,0.15);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(201,168,76,0.2);
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 10 16 10 16;
+}
+
+/* Mesa central: mazo + descarte */
+.table-center {
+    -fx-background-color: rgba(0,0,0,0.22);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(201,168,76,0.4);
+    -fx-border-radius: 16;
+    -fx-border-width: 1.5;
+    -fx-padding: 20 32 20 32;
+}
+
+.zone-label {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #a8c4b0;
+    -fx-letter-spacing: 1px;
+}
+
+/* Mazo (pila boca abajo) */
+.deck-zone {
+    -fx-background-color: linear-gradient(to bottom right, #1a3a6b, #0e2244);
+    -fx-background-radius: 9;
+    -fx-border-color: #c9a84c;
+    -fx-border-width: 2;
+    -fx-border-radius: 9;
+    -fx-min-width: 88;
+    -fx-min-height: 124;
+    -fx-pref-width: 88;
+    -fx-pref-height: 124;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER;
+}
+
+.deck-zone:hover {
+    -fx-border-color: #e8c56a;
+    -fx-effect: dropshadow(gaussian, rgba(201,168,76,0.55), 10, 0, 0, 0);
+}
+
+.deck-hint {
+    -fx-font-size: 10px;
+    -fx-text-fill: rgba(168,196,176,0.8);
+    -fx-text-alignment: CENTER;
+    -fx-wrap-text: true;
+    -fx-max-width: 68;
+}
+
+.deck-count-small {
+    -fx-font-size: 11px;
+    -fx-text-fill: #a8c4b0;
+}
+
+/* Pila de descarte */
+.discard-zone {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-background-radius: 9;
+    -fx-border-color: rgba(201,168,76,0.45);
+    -fx-border-width: 2;
+    -fx-border-radius: 9;
+    -fx-min-width: 88;
+    -fx-min-height: 124;
+    -fx-pref-width: 88;
+    -fx-pref-height: 124;
+    -fx-alignment: CENTER;
+}
+
+.empty-zone-label {
+    -fx-font-size: 26px;
+    -fx-text-fill: rgba(168,196,176,0.5);
+}
+
+.turn-arrow {
+    -fx-font-size: 28px;
+    -fx-text-fill: rgba(201,168,76,0.65);
+    -fx-font-family: "Georgia";
+}
+
+.turn-arrow-sub {
+    -fx-font-size: 9px;
+    -fx-text-fill: #a8c4b0;
+}
+
+.game-message-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e8c56a;
+    -fx-font-family: "Georgia";
+    -fx-background-color: rgba(0,0,0,0.35);
+    -fx-background-radius: 6;
+    -fx-padding: 8 16 8 16;
+    -fx-text-alignment: CENTER;
+    -fx-min-height: 36;
+}
+
+/* ZONA DEL JUGADOR HUMANO */
+.human-player-zone {
+    -fx-background-color: #0a2a17;
+    -fx-border-color: #c9a84c;
+    -fx-border-width: 2 0 0 0;
+}
+
+.action-bar {
+    -fx-padding: 10 20 10 20;
+    -fx-background-color: rgba(0,0,0,0.3);
+    -fx-min-height: 56;
+}
+
+.human-player-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #c9a84c;
+    -fx-letter-spacing: 1.5px;
+}
+
+.human-status-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #a8c4b0;
+}
+
+.action-btn-primary {
+    -fx-background-color: #c9a84c;
+    -fx-border-color: #9a7a2f;
+    -fx-border-width: 1;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-text-fill: #1a1a1a;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Georgia";
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+}
+
+.action-btn-primary:hover {
+    -fx-background-color: #e8c56a;
+}
+
+.action-btn-primary:disabled {
+    -fx-background-color: #6a6460;
+    -fx-border-color: #504c48;
+    -fx-text-fill: #9a9690;
+    -fx-opacity: 0.75;
+}
+
+.action-btn-secondary {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(201,168,76,0.55);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-text-fill: #f0e8d5;
+    -fx-font-size: 12px;
+    -fx-font-family: "Georgia";
+    -fx-padding: 7 14 7 14;
+    -fx-cursor: hand;
+}
+
+.action-btn-secondary:hover {
+    -fx-background-color: rgba(201,168,76,0.15);
+}
+
+.action-btn-secondary:disabled {
+    -fx-border-color: rgba(120,110,90,0.35);
+    -fx-text-fill: rgba(160,152,136,0.5);
+    -fx-opacity: 0.7;
+}
+
+.action-btn-ghost {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255,255,255,0.18);
+    -fx-border-width: 1;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-text-fill: #a8c4b0;
+    -fx-font-size: 12px;
+    -fx-padding: 7 14 7 14;
+    -fx-cursor: hand;
+}
+
+.action-btn-ghost:hover {
+    -fx-background-color: rgba(255,255,255,0.07);
+    -fx-text-fill: #f0e8d5;
+}
+
+.btn-separator {
+    -fx-background-color: rgba(255,255,255,0.12);
+}
+
+.human-hand {
+    -fx-padding: 14 24 18 24;
+    -fx-alignment: CENTER;
+    -fx-min-height: 148;
+    -fx-pref-height: 158;
+    -fx-spacing: 16;
+    -fx-background-color: rgba(0,0,0,0.1);
+}
+
+/* ════════════════════════════════════════
+   CARTAS
+════════════════════════════════════════ */
+
+.card {
+    -fx-background-color: #faf6ee;
+    -fx-background-radius: 9;
+    -fx-border-color: #c0b090;
+    -fx-border-width: 1;
+    -fx-border-radius: 9;
+    -fx-min-width: 82;
+    -fx-pref-width: 82;
+    -fx-min-height: 114;
+    -fx-pref-height: 114;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 7, 0, 1, 2);
+}
+
+.card-playable {
+    -fx-cursor: hand;
+}
+
+.card-playable:hover {
+    -fx-effect: dropshadow(gaussian, rgba(201,168,76,0.75), 14, 0, 0, -4);
+    -fx-translate-y: -8;
+}
+
+.card-selected {
+    -fx-border-color: #c9a84c;
+    -fx-border-width: 2.5;
+    -fx-translate-y: -14;
+    -fx-effect: dropshadow(gaussian, rgba(201,168,76,0.95), 18, 0, 0, 0);
+}
+
+.card-face-down {
+    -fx-background-color: linear-gradient(to bottom right, #1a3a6b, #0e2244);
+    -fx-border-color: #c0b090;
+    -fx-cursor: default;
+}
+
+.card-value-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Georgia";
+}
+
+.card-suit-label {
+    -fx-font-size: 26px;
+    -fx-font-family: "Georgia";
+}
+
+.card-red .card-value-label,
+.card-red .card-suit-label {
+    -fx-text-fill: #c0392b;
+}
+
+.card-black .card-value-label,
+.card-black .card-suit-label {
+    -fx-text-fill: #1a1a1a;
+}
+
+.card-small {
+    -fx-min-width: 56;
+    -fx-pref-width: 56;
+    -fx-min-height: 78;
+    -fx-pref-height: 78;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+}
+
+/* ════════════════════════════════════════
+   OVERLAYS / FIN DE JUEGO
+════════════════════════════════════════ */
+
+.game-over-overlay {
+    -fx-background-color: rgba(0,0,0,0.78);
+}
+
+.game-over-card {
+    -fx-background-color: #faf6ee;
+    -fx-background-radius: 14;
+    -fx-border-color: #c9a84c;
+    -fx-border-width: 2.5;
+    -fx-border-radius: 14;
+    -fx-padding: 44 52 44 52;
+    -fx-max-width: 440;
+    -fx-alignment: CENTER;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.75), 32, 0, 0, 8);
+}
+
+.game-over-title {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Georgia";
+    -fx-text-fill: #1a1a1a;
+}
+
+.game-over-win  { -fx-text-fill: #27ae60; }
+.game-over-lose { -fx-text-fill: #c0392b; }
+
+.game-over-message {
+    -fx-font-size: 15px;
+    -fx-text-fill: #444;
+    -fx-font-family: "Georgia";
+    -fx-text-alignment: CENTER;
+}

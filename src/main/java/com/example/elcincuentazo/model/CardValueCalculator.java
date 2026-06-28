@@ -1,4 +1,4 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.model;
 
 /**
  * Utility class that encapsulates the card-value rules for Cincuentazo.

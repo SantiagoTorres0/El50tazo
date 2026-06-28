@@ -1,6 +1,6 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.model;
 
-import com.example.elcincuentazo.Model.exceptions.InvalidCardPlayException;
+import com.example.elcincuentazo.exceptions.InvalidCardPlayException;
 
 import java.util.List;
 
