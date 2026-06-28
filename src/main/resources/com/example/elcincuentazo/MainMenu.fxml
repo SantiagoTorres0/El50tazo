@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.example.elcincuentazo.controller.MainMenuController"
+           stylesheets="@styles.css"
+           styleClass="root-pane"
+           minWidth="680" minHeight="520">
+    <fx:define>
+        <ToggleGroup fx:id="playerCountGroup"/>
+    </fx:define>
+
+    <VBox styleClass="felt-background" VBox.vgrow="ALWAYS">
+
+        <!-- ── HEADER ── -->
+        <VBox alignment="CENTER" spacing="6" styleClass="menu-header"
+              VBox.vgrow="NEVER">
+            <padding><Insets top="28" bottom="22" left="40" right="40"/></padding>
+            <Label text="♠  ♥" styleClass="suit-icons-top"/>
+            <Label text="El Cincuentazo" styleClass="game-title"/>
+            <Label text="♣  ♦" styleClass="suit-icons-bottom"/>
+            <Label text="El juego de cartas donde 50 es el límite"
+                   styleClass="game-subtitle"/>
+        </VBox>
+
+        <!-- ── CONTENIDO CENTRAL (crece para llenar espacio) ── -->
+        <VBox alignment="CENTER" VBox.vgrow="ALWAYS" styleClass="menu-card-container">
+            <padding><Insets top="32" bottom="32" left="60" right="60"/></padding>
+
+            <VBox alignment="CENTER" spacing="26" styleClass="menu-card"
+                  maxWidth="540">
+
+                <!-- Selección de jugadores -->
+                <VBox alignment="CENTER" spacing="12">
+                    <Label text="¿Cuántos rivales quieres enfrentar?"
+                           styleClass="section-label"/>
+                    <HBox alignment="CENTER" spacing="14">
+                        <ToggleButton fx:id="btn1Player"
+                                      text="1 rival"
+                                      styleClass="player-count-btn"
+                                      onAction="#onPlayerCountSelected"
+                                      toggleGroup="$playerCountGroup"/>
+                        <ToggleButton fx:id="btn2Players"
+                                      text="2 rivales"
+                                      styleClass="player-count-btn"
+                                      onAction="#onPlayerCountSelected"
+                                      toggleGroup="$playerCountGroup"/>
+                        <ToggleButton fx:id="btn3Players"
+                                      text="3 rivales"
+                                      styleClass="player-count-btn"
+                                      onAction="#onPlayerCountSelected"
+                                      toggleGroup="$playerCountGroup"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Reglas rápidas -->
+                <VBox alignment="CENTER" spacing="8" styleClass="rules-summary"
+                      maxWidth="420">
+                    <Label text="Reglas rápidas" styleClass="rules-title"/>
+                    <VBox spacing="5">
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="•" styleClass="bullet"/>
+                            <Label text="Cada jugador tiene 4 cartas en mano"
+                                   styleClass="rule-text" wrapText="true"/>
+                        </HBox>
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="•" styleClass="bullet"/>
+                            <Label text="La suma de la mesa no puede superar 50"
+                                   styleClass="rule-text" wrapText="true"/>
+                        </HBox>
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="•" styleClass="bullet"/>
+                            <Label text="Tras jugar una carta, toma una del mazo"
+                                   styleClass="rule-text" wrapText="true"/>
+                        </HBox>
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="•" styleClass="bullet"/>
+                            <Label text="Si no puedes jugar ninguna carta, ¡quedas eliminado!"
+                                   styleClass="rule-text" wrapText="true"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Botón iniciar -->
+                <Button fx:id="btnStartGame"
+                        text="¡Comenzar partida!"
+                        styleClass="start-button"
+                        onAction="#onStartGame"
+                        disable="true"
+                        maxWidth="Infinity"/>
+
+            </VBox>
+        </VBox>
+
+        <!-- ── FOOTER ── -->
+        <HBox alignment="CENTER" spacing="24" styleClass="menu-footer"
+              VBox.vgrow="NEVER">
+            <padding><Insets top="13" bottom="13" left="36" right="36"/></padding>
+            <Label text="♠ A" styleClass="corner-card"/>
+            <Label text="Cincuentazo v1.0" styleClass="footer-text" HBox.hgrow="ALWAYS"
+                   textAlignment="CENTER" maxWidth="Infinity"/>
+            <Label text="A ♥" styleClass="corner-card"/>
+        </HBox>
+
+    </VBox>
+
+
+
+
+</StackPane>

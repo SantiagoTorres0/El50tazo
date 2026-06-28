@@ -1,4 +1,7 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.observer;
+
+import com.example.elcincuentazo.model.Card;
+import com.example.elcincuentazo.model.Player;
 
 /**
  * Observer interface that the View/Controller implements to react to game events.

@@ -1,6 +1,6 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.model;
 
-import com.example.elcincuentazo.Model.exceptions.EmptyDeckException;
+import com.example.elcincuentazo.exceptions.EmptyDeckException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

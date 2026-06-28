@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.elcincuentazo.controller.GameScreenController"
+            stylesheets="@styles.css"
+            styleClass="game-root"
+            prefWidth="1100" prefHeight="720"
+            minWidth="900" minHeight="600">
+
+    <!-- ══════════════════════════════════════════════════════
+         TOP BAR
+    ══════════════════════════════════════════════════════ -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER" spacing="0">
+
+            <!-- Sección izquierda: mazo -->
+            <HBox alignment="CENTER_LEFT" spacing="6"
+                  HBox.hgrow="ALWAYS" styleClass="top-section">
+                <Label text="Mazo:" styleClass="top-label"/>
+                <Label fx:id="lblDeckCount" text="40" styleClass="top-value"/>
+                <Label text="cartas" styleClass="top-label"/>
+            </HBox>
+
+            <!-- Centro: suma -->
+            <VBox alignment="CENTER" styleClass="sum-display">
+                <Label text="SUMA EN MESA" styleClass="sum-label-title"/>
+                <HBox alignment="CENTER" spacing="4">
+                    <Label fx:id="lblTableSum" text="0" styleClass="sum-value"/>
+                    <Label text="/ 50" styleClass="sum-limit"/>
+                </HBox>
+                <ProgressBar fx:id="pbSumProgress" progress="0.0"
+                             styleClass="sum-progress" maxWidth="150"
+                             prefHeight="6"/>
+            </VBox>
+
+            <!-- Sección derecha: turno -->
+            <HBox alignment="CENTER_RIGHT" spacing="8"
+                  HBox.hgrow="ALWAYS" styleClass="top-section">
+                <Label fx:id="lblTurnStatus" text="Tu turno"
+                       styleClass="turn-status-label"/>
+                <Label fx:id="lblTurnIndicator" text="●"
+                       styleClass="turn-indicator-active"/>
+            </HBox>
+
+        </HBox>
+    </top>
+
+    <!-- ══════════════════════════════════════════════════════
+         CENTER — Área de juego
+    ══════════════════════════════════════════════════════ -->
+    <center>
+        <GridPane styleClass="game-area" hgap="6" vgap="0">
+            <padding><Insets top="10" right="10" bottom="6" left="10"/></padding>
+
+            <!-- Columna izq.: Máquina 2 (oculta por defecto) -->
+            <VBox fx:id="panePlayer2"
+                  GridPane.columnIndex="0" GridPane.rowIndex="0"
+                  alignment="CENTER" spacing="10"
+                  styleClass="side-player-zone"
+                  visible="false" managed="false">
+                <Label fx:id="lblPlayer2Name" text="Máquina 2"
+                       styleClass="player-name-label"/>
+                <Label fx:id="lblPlayer2Status" text="4 cartas"
+                       styleClass="player-status-label"/>
+                <VBox fx:id="handPlayer2" spacing="-48" alignment="CENTER"
+                      styleClass="cpu-hand-vertical"/>
+                <Label fx:id="indicatorPlayer2" text="▶ Jugando..."
+                       styleClass="active-turn-indicator" visible="false"/>
+                <Label fx:id="elimPlayer2" text="✕ ELIMINADO"
+                       styleClass="eliminated-badge" visible="false"/>
+            </VBox>
+
+            <!-- Columna central -->
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="0"
+                  alignment="CENTER" spacing="12"
+                  styleClass="center-table-zone"
+                  GridPane.hgrow="ALWAYS">
+
+                <!-- Máquina 1 (siempre visible) -->
+                <VBox fx:id="panePlayer1" alignment="CENTER" spacing="8"
+                      styleClass="top-player-zone" maxWidth="Infinity">
+                    <HBox alignment="CENTER" spacing="10">
+                        <Label fx:id="lblPlayer1Name" text="Máquina 1"
+                               styleClass="player-name-label"/>
+                        <Label fx:id="lblPlayer1Status" text="4 cartas"
+                               styleClass="player-status-label"/>
+                        <Label fx:id="indicatorPlayer1" text="▶ Jugando..."
+                               styleClass="active-turn-indicator" visible="false"/>
+                        <Label fx:id="elimPlayer1" text="✕ ELIMINADO"
+                               styleClass="eliminated-badge" visible="false"/>
+                    </HBox>
+                    <HBox fx:id="handPlayer1" spacing="-32" alignment="CENTER"
+                          styleClass="cpu-hand-horizontal"/>
+                </VBox>
+
+                <!-- Mesa: mazo + descarte -->
+                <HBox alignment="CENTER" spacing="36" styleClass="table-center">
+
+                    <VBox alignment="CENTER" spacing="6">
+                        <Label text="MAZO" styleClass="zone-label"/>
+                        <StackPane fx:id="deckZone" styleClass="deck-zone"
+                                   onMouseClicked="#onDrawFromDeck">
+                            <Label text="Tomar carta" styleClass="deck-hint"
+                                   wrapText="true"/>
+                        </StackPane>
+                        <Label fx:id="lblDeckCountSmall" text="40 restantes"
+                               styleClass="deck-count-small"/>
+                    </VBox>
+
+                    <VBox alignment="CENTER" spacing="3">
+                        <Label fx:id="lblArrow" text="→" styleClass="turn-arrow"/>
+                        <Label text="turno" styleClass="turn-arrow-sub"/>
+                    </VBox>
+
+                    <VBox alignment="CENTER" spacing="6">
+                        <Label text="EN MESA" styleClass="zone-label"/>
+                        <StackPane fx:id="discardZone" styleClass="discard-zone">
+                            <Label fx:id="lblNoCard" text="—"
+                                   styleClass="empty-zone-label"/>
+                        </StackPane>
+                        <Label fx:id="lblLastCardDesc" text="Carta inicial"
+                               styleClass="deck-count-small"/>
+                    </VBox>
+
+                </HBox>
+
+                <!-- Mensaje de estado -->
+                <Label fx:id="lblGameMessage" text=""
+                       styleClass="game-message-label"
+                       wrapText="true" textAlignment="CENTER"
+                       maxWidth="400" minHeight="36"/>
+
+            </VBox>
+
+            <!-- Columna der.: Máquina 3 (oculta por defecto) -->
+            <VBox fx:id="panePlayer3"
+                  GridPane.columnIndex="2" GridPane.rowIndex="0"
+                  alignment="CENTER" spacing="10"
+                  styleClass="side-player-zone"
+                  visible="false" managed="false">
+                <Label fx:id="lblPlayer3Name" text="Máquina 3"
+                       styleClass="player-name-label"/>
+                <Label fx:id="lblPlayer3Status" text="4 cartas"
+                       styleClass="player-status-label"/>
+                <VBox fx:id="handPlayer3" spacing="-48" alignment="CENTER"
+                      styleClass="cpu-hand-vertical"/>
+                <Label fx:id="indicatorPlayer3" text="▶ Jugando..."
+                       styleClass="active-turn-indicator" visible="false"/>
+                <Label fx:id="elimPlayer3" text="✕ ELIMINADO"
+                       styleClass="eliminated-badge" visible="false"/>
+            </VBox>
+
+            <!-- Definición de columnas -->
+            <columnConstraints>
+                <ColumnConstraints fx:id="colLeft"
+                                   minWidth="0" prefWidth="140" maxWidth="160"
+                                   hgrow="NEVER"/>
+                <ColumnConstraints fx:id="colCenter"
+                                   minWidth="300"
+                                   hgrow="ALWAYS"/>
+                <ColumnConstraints fx:id="colRight"
+                                   minWidth="0" prefWidth="140" maxWidth="160"
+                                   hgrow="NEVER"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints vgrow="ALWAYS"/>
+            </rowConstraints>
+
+        </GridPane>
+    </center>
+
+    <!-- ══════════════════════════════════════════════════════
+         BOTTOM — Mano del jugador humano
+    ══════════════════════════════════════════════════════ -->
+    <bottom>
+        <VBox styleClass="human-player-zone">
+
+            <!-- Barra de acción -->
+            <HBox styleClass="action-bar" alignment="CENTER" spacing="14">
+                <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
+
+                <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" spacing="3">
+                    <Label text="TU MANO" styleClass="human-player-title"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label fx:id="lblHumanStatus"
+                               text="Selecciona una carta para jugar"
+                               styleClass="human-status-label"/>
+                        <Label fx:id="indicatorHuman" text="▶ Tu turno"
+                               styleClass="active-turn-indicator" visible="false"/>
+                    </HBox>
+                </VBox>
+
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button fx:id="btnPlayCard"
+                            text="Jugar carta ▶"
+                            styleClass="action-btn-primary"
+                            onAction="#onPlayCard"
+                            disable="true"/>
+                    <Button fx:id="btnDrawCard"
+                            text="Tomar del mazo"
+                            styleClass="action-btn-secondary"
+                            onAction="#onDrawFromDeck"
+                            disable="true"/>
+                    <Separator orientation="VERTICAL" styleClass="btn-separator"/>
+                    <Button fx:id="btnMenuReturn"
+                            text="Menú"
+                            styleClass="action-btn-ghost"
+                            onAction="#onReturnToMenu"/>
+                </HBox>
+
+            </HBox>
+
+            <!-- Cartas del humano -->
+            <HBox fx:id="handHuman" alignment="CENTER" spacing="16"
+                  styleClass="human-hand">
+                <padding><Insets top="12" right="24" bottom="16" left="24"/></padding>
+                <!-- Las 4 cartas se añaden dinámicamente desde GameController -->
+            </HBox>
+
+        </VBox>
+    </bottom>
+
+</BorderPane>

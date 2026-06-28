@@ -1,4 +1,4 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.model;
 
 /**
  * Represents the human player in a Cincuentazo game.

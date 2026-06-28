@@ -1,4 +1,4 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.model;
 
 /**
  * Unchecked (runtime) exception thrown when an operation is requested on a

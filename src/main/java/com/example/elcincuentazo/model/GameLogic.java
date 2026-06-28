@@ -1,8 +1,8 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.model;
 
-import com.example.elcincuentazo.Model.exceptions.GameOverException;
-import com.example.elcincuentazo.Model.exceptions.InvalidCardPlayException;
-import com.example.elcincuentazo.Model.observer.GameEventListener;
+import com.example.elcincuentazo.exceptions.GameOverException;
+import com.example.elcincuentazo.exceptions.InvalidCardPlayException;
+import com.example.elcincuentazo.observer.GameEventListener;
 
 import java.util.ArrayList;
 import java.util.List;

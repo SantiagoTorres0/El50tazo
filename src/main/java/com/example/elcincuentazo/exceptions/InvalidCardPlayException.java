@@ -1,4 +1,4 @@
-package com.example.elcincuentazo.Model.exceptions;
+package com.example.elcincuentazo.exceptions;
 
 /**
  * Checked exception thrown when a player attempts to play a card that would

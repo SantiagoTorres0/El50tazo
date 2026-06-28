@@ -1,4 +1,4 @@
-package com.example.elcincuentazo.Model;
+package com.example.elcincuentazo.model;
 
 import java.util.ArrayList;
 import java.util.List;
